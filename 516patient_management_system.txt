@@ -1,0 +1,128 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_PATIENTS 100
+
+struct Patient {
+    int patientID;
+    char name[50];
+    char disease[50];
+    char doctor[50];
+    char status[10]; // "Admitted" or "Discharged"
+    float bill;
+};
+
+struct Patient patients[MAX_PATIENTS];
+int count = 0;
+
+void addPatient() {
+    if (count < MAX_PATIENTS) {
+        printf("Enter patient ID: ");
+        scanf("%d", &patients[count].patientID);
+        getchar(); // Consume newline character
+
+        printf("Enter patient name: ");
+        fgets(patients[count].name, 50, stdin);
+        patients[count].name[strcspn(patients[count].name, "\n")] = '\0'; // Remove newline character
+
+        printf("Enter patient disease: ");
+        fgets(patients[count].disease, 50, stdin);
+        patients[count].disease[strcspn(patients[count].disease, "\n")] = '\0'; // Remove newline character
+
+        printf("Enter patient doctor: ");
+        fgets(patients[count].doctor, 50, stdin);
+        patients[count].doctor[strcspn(patients[count].doctor, "\n")] = '\0'; // Remove newline character
+
+        printf("Enter patient bill: ");
+        scanf("%f", &patients[count].bill);
+        getchar(); // Consume newline character
+
+        strcpy(patients[count].status, "Admitted");
+
+        count++;
+        printf("Patient added successfully!\n");
+    } else {
+        printf("Maximum number of patients reached.\n");
+    }
+}
+
+void displayPatients() {
+    if (count == 0) {
+        printf("No patients available.\n");
+    } else {
+        printf("\nList of Patients:\n");
+        printf("ID\tName\t\tDisease\t\tDoctor\t\tStatus\t\tBill\n");
+        printf("-----------------------------------------------------------------------------------\n");
+        for (int i = 0; i < count; i++) {
+            printf("%d\t%s\t\t%s\t\t%s\t\t%s\t%.2f\n", patients[i].patientID, patients[i].name, patients[i].disease, patients[i].doctor, patients[i].status, patients[i].bill);
+        }
+    }
+}
+
+void dischargePatient() {
+    int id;
+    printf("Enter patient ID to discharge: ");
+    scanf("%d", &id);
+
+    int found = 0;
+    for (int i = 0; i < count; i++) {
+        if (patients[i].patientID == id) {
+            if (strcmp(patients[i].status, "Admitted") == 0) {
+                printf("Patient has a bill of %.2f.\n", patients[i].bill);
+                printf("Do you want to pay the bill? (y/n): ");
+                char choice;
+                scanf(" %c", &choice);
+
+                if (choice == 'y' || choice == 'Y') {
+                    printf("Bill paid successfully!\n");
+                    patients[i].bill = 0.0;
+                    strcpy(patients[i].status, "Discharged");
+                    printf("Patient discharged successfully!\n");
+                } else {
+                    printf("Patient cannot be discharged until the bill is paid.\n");
+                }
+            } else {
+                printf("Patient is already discharged.\n");
+            }
+            found = 1;
+            break;
+        }
+    }
+
+    if (!found) {
+        printf("Patient not found.\n");
+    }
+}
+
+int main() {
+    int choice;
+    while (1) {
+        printf("\nPatient Management System\n");
+        printf("1. Add Patient\n");
+        printf("2. Display All Patients\n");
+        printf("3. Discharge Patient\n");
+        printf("4. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                addPatient();
+                break;
+            case 2:
+                displayPatients();
+                break;
+            case 3:
+                dischargePatient();
+                break;
+            case 4:
+                printf("Exiting system...\n");
+                return 0;
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+    }
+
+    return 0;
+}
+
